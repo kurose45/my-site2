@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>ロマ子アクション 〜王冠とうんこの伝説〜</title>
+<meta name="description" content="ブラウザで遊べるファミコン風の横スクロールアクション。王冠をとってうんこを投げろ！全4ステージ。ボスは二本足の虎。スマホでも遊べます。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ロマ子アクション">
+<meta property="og:title" content="ロマ子アクション 〜王冠とうんこの伝説〜">
+<meta property="og:description" content="ブラウザで遊べるファミコン風の横スクロールアクション。王冠をとってうんこを投げろ！全4ステージ。ボスは二本足の虎。スマホでも遊べます。">
+<meta property="og:url" content="https://kurose45.github.io/my-site2/">
+<meta property="og:image" content="https://kurose45.github.io/my-site2/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ロマ子アクション 〜王冠とうんこの伝説〜">
+<meta name="twitter:description" content="ブラウザで遊べるファミコン風の横スクロールアクション。王冠をとってうんこを投げろ！">
+<meta name="twitter:image" content="https://kurose45.github.io/my-site2/ogp.png">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-title" content="ロマ子アクション">
 <style>
   * {
     box-sizing: border-box;
@@ -82,8 +98,9 @@
 /* =========================================================
    ロマ子アクション
    主人公: ロマ子様（やられるとヤミ子に交代）
-   敵: 二足歩行オオカミ / カメラを持ったキモオタ
-   アイテム: 王冠 → うんこを投げられるようになる
+   敵: 二足歩行オオカミ / カメラを持ったキモオタ / すばしこいネズミ
+   アイテム: 王冠 → うんこを投げられる / 赤いヘアピン → 1UP
+   ステージ: 草原 → 雲の上 → 大草原
    ========================================================= */
 
 const cv = document.getElementById('cv');
@@ -124,7 +141,13 @@ const PAL = {
   'o': '#ffc93c',   // 金/王冠
   'c': '#8b5a2b',   // うんこ
   'C': '#5c3a1a',
-  'f': '#fff7c0'    // フラッシュ
+  'f': '#fff7c0',   // フラッシュ
+  'm': '#c3cad3',   // ネズミの体
+  'M': '#7c8593',   // ネズミの影・耳のふち
+  'q': '#ffb0c4',   // 鼻・耳の内側・コブタ
+  'Q': '#e0789a',   // コブタの濃いピンク
+  'T': '#f0801f',   // 虎のオレンジ
+  'Z': '#3b1f0b'    // 虎の縞
 };
 
 function mk(rows) { return { rows: rows, w: rows[0].length, h: rows.length }; }
@@ -239,6 +262,91 @@ const CROWN = mk([
   '.YYYYYYYYYY.',
   '............'
 ]);
+
+/* --- すばしこいネズミ（16 x 18） --- */
+const MOUSE_BODY = [
+  '.MMM......MMM...',
+  'MmqmM....MmqmM..',
+  'MmmmM....MmmmM..',
+  '.MMM.mmmm.MMM...',
+  '...mmmmmmmmm....',
+  '..mmmmmmmmmmm...',
+  '..mmkmmmmkmmm...',
+  '..mmmmmmmmmmm...',
+  '...wwwwqwwww....',
+  '....wwwwwww.....',
+  '....mmmmmmm.....',
+  '...mmmmmmmmm.MM.',
+  '..mmmmmmmmmmm.M.',
+  '...vvvvvvvvv....',
+  '...vwvvvvvwv....'
+];
+const MOUSE = [
+  mk(MOUSE_BODY.concat([
+    '...mm.....mm....',
+    '..ooo.....ooo...',
+    '.oooo.....oooo..'
+  ])),
+  mk(MOUSE_BODY.concat([
+    '....mm...mm.....',
+    '...ooo...ooo....',
+    '..oooo...oooo...'
+  ]))
+];
+
+/* --- コブタ（お供・14 x 12） --- */
+const KOBUTA_BODY = [
+  '..QQ......QQ..',
+  '.QqqQ....QqqQ.',
+  '.qqqqqqqqqqqq.',
+  'qqqqqqqqqqqqqq',
+  'qqkqqqqqqqqkqq',
+  'qqqqqqqqqqqqqq',
+  '.qqqQQQQQQqqq.',
+  '.qqqQkQQkQqqq.',
+  '.qqqQQQQQQqqq.',
+  '..qqqqqqqqqq..'
+];
+const KOBUTA = [
+  mk(KOBUTA_BODY.concat(['..qq......qq..', '..QQ......QQ..'])),
+  mk(KOBUTA_BODY.concat(['...qq....qq...', '...QQ....QQ...']))
+];
+
+/* --- 二本足の虎（ボス・20 x 22） --- */
+const TIGER_BODY = [
+  '..TT..........TT....',
+  '.TqqT........TqqT...',
+  '.TZTTTTTTTTTTTTZT...',
+  '.TTTTZTTTTZTTTTT....',
+  '.TZTTTTTTTTTTTTZT...',
+  '.TTrTTTTTTTTrTTTT...',
+  '.TTTTTwwwwTTTTTT....',
+  '.TTTTwkwwkwTTTTT....',
+  '..TTTwwwwwwTTTT.....',
+  '...TTTwwwwTTTTT.....',
+  '....TTTTTTTTTT......',
+  '..ZTTTTTTTTTTTTZ....',
+  '..TTZTTwwwwTTZTT....',
+  '..TTTTTwwwwTTTTT....',
+  '..ZTTTTwwwwTTTTZ....',
+  '..TTZTTwwwwTTZTT....',
+  '...TTTTTTTTTTTT.....',
+  '..ZTTTTTTTTTTTTZ....'
+];
+const TIGER = [
+  mk(TIGER_BODY.concat([
+    '...TTTT....TTTT.....',
+    '...TTTT....TTTT.....',
+    '..ZZZZZ..ZZZZZ......',
+    '..ZZZZZ..ZZZZZ......'
+  ])),
+  mk(TIGER_BODY.concat([
+    '....TTTT..TTTT......',
+    '....TTTT..TTTT......',
+    '...ZZZZZ.ZZZZZ......',
+    '...ZZZZZ.ZZZZZ......'
+  ]))
+];
 
 /* --- 赤いヘアピン（1UP・16 x 10） --- */
 const HAIRPIN = mk([
@@ -672,9 +780,361 @@ const STAGE2_CHUNKS = [
   ]
 ];
 
+/* ===== ステージ3「大草原不可避」 見わたす限りの草原 =====
+   すばしこいネズミが群れをなして突進してくる。 */
+const STAGE3_CHUNKS = [
+  [ // 1 見わたす限りの草原
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '..........C.C.......',
+    '.........=?=........',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '####################',
+    '####################'
+  ],
+  [ // 2 ネズミ初登場
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '.......C.C.C........',
+    '....................',
+    '....................',
+    '....................',
+    '.....n.........n....',
+    '####################',
+    '####################'
+  ],
+  [ // 3 なだらかな丘
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '..............n.....',
+    '.............XXX....',
+    '..........XXXXXX....',
+    '.......XXXXXXXXX....',
+    '..w....XXXXXXXXX....',
+    '####################',
+    '####################'
+  ],
+  [ // 4 草原の王冠
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '.........C..........',
+    '........=!=.........',
+    '....................',
+    '....................',
+    '....................',
+    '....n..........n....',
+    '####################',
+    '####################'
+  ],
+  [ // 5 草原の切れ目
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '.....C.......C......',
+    '....................',
+    '....................',
+    '......XXXXXXXXXX....',
+    '....................',
+    '..w.................',
+    '######........######',
+    '######........######'
+  ],
+  [ // 6 ネズミの群れ
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '......======........',
+    '....................',
+    '....................',
+    '....................',
+    '...n..........n.....',
+    '####################',
+    '####################'
+  ],
+  [ // 7 草原の1UP
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '.....C....C.........',
+    '....=1=..=?=........',
+    '....................',
+    '....................',
+    '....................',
+    '..............o.....',
+    '####################',
+    '####################'
+  ],
+  [ // 8 とび石
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '.....XXX..XXX.......',
+    '....................',
+    '.................n..',
+    '####..........######',
+    '####..........######'
+  ],
+  [ // 9 大きな丘とネズミ
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '......n.......n.....',
+    '....XXXXXXXXXXXX....',
+    '...XXXXXXXXXXXXX....',
+    '..XXXXXXXXXXXXXX....',
+    '.XXXXXXXXXXXXXXX....',
+    '.XXXXXXXXXXXXXXX....',
+    '####################',
+    '####################'
+  ],
+  [ // 10 総力戦
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '.........C..........',
+    '........===.........',
+    '....................',
+    '....................',
+    '...n...w....o...n...',
+    '####################',
+    '####################'
+  ],
+  [ // 11 最後の丘
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '..............X.....',
+    '.............XX.....',
+    '............XXX.....',
+    '...........XXXX.....',
+    '####################',
+    '####################'
+  ],
+  [ // 12 ゴール
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....G..........n....',
+    '####################',
+    '####################'
+  ]
+];
+
+/* ===== ステージ4「虎の要塞」 ボス面 =====
+   K = コブタブロック  T = 虎ボスの出現位置 */
+const STAGE4_CHUNKS = [
+  [ // 1 要塞の入口
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '..........C.C.......',
+    '.........=?=........',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '####################',
+    '####################'
+  ],
+  [ // 2 ひとつめの王冠
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '.......C............',
+    '......=!=...........',
+    '....................',
+    '....................',
+    '....................',
+    '..w..........n......',
+    '####################',
+    '####################'
+  ],
+  [ // 3 石段と守備隊
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '............CC......',
+    '...........XXXX.....',
+    '....................',
+    '.....XXXX...........',
+    '..n.........w...n...',
+    '####################',
+    '####################'
+  ],
+  [ // 4 コブタの間
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '.........C..........',
+    '........=K=.........',
+    '....................',
+    '....................',
+    '....................',
+    '...w.....n......w...',
+    '####################',
+    '####################'
+  ],
+  [ // 5 1UPと哨戒
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '......C.............',
+    '.....=1=............',
+    '....................',
+    '....................',
+    '....................',
+    '....n.......o...n...',
+    '####################',
+    '####################'
+  ],
+  [ // 6 ふたつめの王冠
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '............C.......',
+    '...........=!=......',
+    '....................',
+    '....................',
+    '....................',
+    '..n...w....n....w...',
+    '####################',
+    '####################'
+  ],
+  [ // 7 大扉の前
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '................o...',
+    '####################',
+    '####################'
+  ],
+  [ // 8 玉座の間（虎）
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '....................',
+    '............T.......',
+    '####################',
+    '####################'
+  ]
+];
+
 const STAGES = [
   { title: 'はじまりの草原', chunks: STAGE1_CHUNKS, theme: 'ground', time: 300 },
-  { title: '雲の上の王国', chunks: STAGE2_CHUNKS, theme: 'sky', time: 320 }
+  { title: '雲の上の王国', chunks: STAGE2_CHUNKS, theme: 'sky', time: 320 },
+  { title: '大草原不可避', chunks: STAGE3_CHUNKS, theme: 'grass', time: 340 },
+  { title: '虎の要塞', chunks: STAGE4_CHUNKS, theme: 'fort', time: 360 }
 ];
 
 const ROWS = 15;
@@ -693,7 +1153,7 @@ function buildMap(chunks) {
   LEVEL_W = COLS * TILE;
 }
 
-const SOLID = { '#': 1, '=': 1, 'X': 1, '?': 1, '!': 1, '1': 1, 'U': 1 };
+const SOLID = { '#': 1, '=': 1, 'X': 1, '?': 1, '!': 1, '1': 1, 'K': 1, 'U': 1 };
 function tileAt(cx, ry) {
   if (ry < 0 || ry >= ROWS || cx < 0 || cx >= COLS) return '.';
   return MAP[ry][cx];
@@ -752,15 +1212,22 @@ const player = {
   inv: 0, anim: 0, throwCool: 0, deadTimer: 0, coyote: 0, jbuf: 0
 };
 
-let enemies = [], items = [], poops = [], particles = [], popups = [];
+let enemies = [], items = [], poops = [], particles = [], popups = [], rocks = [];
+let pet = null;          // コブタ（ついてくるお供・1ダメージ身代わり）
+let petTrail = [];       // ロマ子様の足あと（コブタが追いかける）
+let boss = null;         // 虎ボス
+let bossWin = 0;         // 撃破後の演出カウント
 
 function resetLevelObjects() {
-  enemies = []; items = []; poops = []; particles = []; popups = [];
+  enemies = []; items = []; poops = []; particles = []; popups = []; rocks = [];
+  boss = null; bossWin = 0;
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       const t = MAP[r][c];
       if (t === 'w') enemies.push(makeWolf(c * TILE, r * TILE));
       else if (t === 'o') enemies.push(makeOtaku(c * TILE, r * TILE));
+      else if (t === 'n') enemies.push(makeMouse(c * TILE, r * TILE));
+      else if (t === 'T') boss = makeTiger(c * TILE, r * TILE);
     }
   }
 }
@@ -772,6 +1239,19 @@ function makeOtaku(x, y) {
   return {
     type: 'otaku', x: x + 2, y: y + TILE - 34, w: 28, h: 34, vx: -0.5, vy: 0,
     dead: 0, anim: 0, timer: 60 + Math.random() * 90, phase: 'walk', flash: 0
+  };
+}
+function makeMouse(x, y) {
+  return {
+    type: 'mouse', x: x + 2, y: y + TILE - 32, w: 28, h: 32, vx: -1.7, vy: 0,
+    dead: 0, anim: 0, timer: 100 + Math.random() * 90, phase: 'walk', base: 1.7, dash: 3.9
+  };
+}
+function makeTiger(x, y) {
+  return {
+    type: 'tiger', x: x, y: y + TILE - 84, w: 66, h: 84, vx: 0, vy: 0,
+    hp: 5, maxHp: 5, inv: 0, dead: 0, anim: 0, face: -1,
+    phase: 'sleep', timer: 0, onGround: false, roars: 0
   };
 }
 
@@ -807,7 +1287,8 @@ function spawnPlayer(x) {
   player.y = ry * TILE - player.h - 1;
   player.vx = 0; player.vy = 0; player.inv = 90; player.deadTimer = 0;
   player.face = 1; player.throwCool = 0;
-  poops = [];
+  poops = []; rocks = [];
+  pet = null; petTrail = [];
 }
 
 function showMsg(t, frames) { msg = t; msgTimer = frames; }
@@ -959,6 +1440,14 @@ function bumpBlock(c, r) {
     });
     sfx1up();
     showMsg('赤いヘアピンが出た！', 110);
+  } else if (t === 'K') {
+    MAP[r][c] = 'U';
+    items.push({
+      type: 'kobuta', x: c * TILE + 2, y: r * TILE - 4, spawnY: r * TILE,
+      w: 28, h: 24, vx: 0, vy: -3, pop: 16
+    });
+    sfxCrown();
+    showMsg('コブタがあらわれた！', 110);
   } else if (t === '=') {
     if (player.crown) {
       MAP[r][c] = '.';
@@ -1076,6 +1565,42 @@ function updateEnemies() {
       }
       if (e.vx === 0) e.vx = 1.1;
       e.anim = Math.floor(frameCount / 8) % 2;
+    } else if (e.type === 'mouse') {
+      // すばしこいネズミ: 速く歩く → 身を沈めて溜める → 猛ダッシュ
+      e.timer--;
+      const dir = e.vx >= 0 ? 1 : -1;
+      if (e.phase === 'walk') {
+        if (Math.abs(e.vx) > e.base) e.vx = dir * e.base;
+        if (e.timer <= 0) {
+          e.phase = 'crouch'; e.timer = 26;
+          // プレイヤーの方を向いて構える
+          e.vx = (player.x < e.x ? -0.001 : 0.001);
+        }
+      } else if (e.phase === 'crouch') {
+        e.vx = 0;
+        if (e.timer <= 0) {
+          e.phase = 'dash'; e.timer = 30;
+          e.vx = (player.x < e.x ? -e.dash : e.dash);
+        }
+      } else {
+        if (e.timer <= 0) {
+          e.phase = 'walk'; e.timer = 120 + Math.random() * 90;
+          e.vx = (e.vx >= 0 ? e.base : -e.base);
+        }
+      }
+      moveBox(e, 0.5, 12);
+      if (e.hitWall) { e.vx = -e.vx || e.base; if (e.phase === 'dash') { e.phase = 'walk'; e.timer = 60; } }
+      // 崖で引き返す
+      if (e.onGround) {
+        const ahead = Math.floor((e.vx > 0 ? e.x + e.w + 5 : e.x - 5) / TILE);
+        const below = Math.floor((e.y + e.h + 4) / TILE);
+        if (!isSolid(ahead, below)) {
+          e.vx = -e.vx;
+          if (e.phase === 'dash') { e.phase = 'walk'; e.timer = 60; }
+        }
+      }
+      if (e.vx === 0 && e.phase !== 'crouch') e.vx = e.base;
+      e.anim = e.phase === 'crouch' ? 0 : Math.floor(frameCount / (e.phase === 'dash' ? 3 : 6)) % 2;
     } else {
       // キモオタ: 歩く → 構える → フラッシュ
       e.timer--;
@@ -1111,6 +1636,7 @@ function updateEnemies() {
       e.face = e.vx !== 0 ? (e.vx > 0 ? 1 : -1) : (e.face || -1);
     }
     if (e.type === 'wolf') e.face = e.vx > 0 ? 1 : -1;
+    if (e.type === 'mouse') { if (e.vx !== 0) e.face = e.vx > 0 ? 1 : -1; }
 
     if (e.y > LEVEL_H + 80) { enemies.splice(i, 1); continue; }
 
@@ -1136,10 +1662,11 @@ function updateEnemies() {
 function killEnemy(e, how) {
   if (e.dead) return;
   e.dead = 30;
-  score += how === 'poop' ? 300 : 200;
-  popups.push({ x: e.x, y: e.y, t: how === 'poop' ? '+300' : '+200', life: 45 });
+  const base = e.type === 'mouse' ? 400 : 200;   // ネズミは素早いので高得点
+  score += how === 'poop' ? base + 100 : base;
+  popups.push({ x: e.x, y: e.y, t: '+' + (how === 'poop' ? base + 100 : base), life: 45 });
   sfxKill();
-  const col = e.type === 'wolf' ? '#8b7f70' : '#7ecb52';
+  const col = e.type === 'wolf' ? '#8b7f70' : (e.type === 'mouse' ? '#c3cad3' : '#7ecb52');
   for (let i = 0; i < 8; i++) {
     particles.push({
       x: e.x + e.w / 2, y: e.y + e.h / 2,
@@ -1214,6 +1741,15 @@ function updateItems() {
         for (let k = 0; k < 12; k++) {
           particles.push({ x: it.x + 12, y: it.y, vx: (Math.random() - .5) * 6, vy: -Math.random() * 6, life: 40, col: '#ffc93c' });
         }
+      } else if (it.type === 'kobuta') {
+        pet = { x: player.x, y: player.y + 10, face: player.face };
+        petTrail = [];
+        score += 300;
+        showMsg('コブタが仲間になった！ 1回だけ守ってくれる', 140);
+        sfxCrown();
+        for (let k = 0; k < 12; k++) {
+          particles.push({ x: it.x + 14, y: it.y, vx: (Math.random() - .5) * 6, vy: -Math.random() * 6, life: 40, col: '#ffb0c4' });
+        }
       } else if (it.type === 'hairpin') {
         lives++;
         showMsg('❤ 1UP！ 残り ' + lives + '人', 130);
@@ -1229,6 +1765,26 @@ function updateItems() {
 }
 
 function damagePlayer() {
+  // コブタが身代わりになってくれる
+  if (pet) {
+    popups.push({
+      x: pet.x - 44, y: pet.y - 6, t: 'グェー死んだンゴ',
+      life: 120, col: '#ffd93b', big: true, vy: -0.55
+    });
+    for (let k = 0; k < 16; k++) {
+      particles.push({
+        x: pet.x + 14, y: pet.y + 12,
+        vx: (Math.random() - .5) * 8, vy: -Math.random() * 7 - 1,
+        life: 44, col: k % 2 ? '#ffb0c4' : '#e0789a'
+      });
+    }
+    pet = null; petTrail = [];
+    player.inv = 100;
+    shake = 9;
+    beep(300, 0.1, 'square', 0.05);
+    setTimeout(function () { beep(180, 0.3, 'sawtooth', 0.05); }, 90);
+    return;
+  }
   if (player.crown) {
     player.crown = false;
     player.inv = 100;
@@ -1275,6 +1831,229 @@ function doClear() {
   else { state = 'allclear'; }
 }
 
+/* ---------------------------------------------------------
+   8-b. ボス: 二本足の虎
+   眠っている → 咆哮（雑魚を呼ぶ）→ 突進 → 跳びかかり（落石）の繰り返し
+   --------------------------------------------------------- */
+function updateBoss() {
+  if (bossWin > 0) {
+    bossWin--;
+    if (bossWin % 7 === 0 && boss) {
+      particles.push({
+        x: boss.x + Math.random() * boss.w, y: boss.y + Math.random() * boss.h,
+        vx: (Math.random() - .5) * 5, vy: -Math.random() * 5 - 1, life: 40, col: '#f0801f'
+      });
+    }
+    if (bossWin === 1) { boss = null; doClear(); }
+    return;
+  }
+  const b = boss;
+  if (!b || b.dead) return;
+  if (b.inv > 0) b.inv--;
+
+  const px = player.x + player.w / 2;
+  const bx = b.x + b.w / 2;
+
+  if (b.phase === 'sleep') {
+    // 近づくまで待ちかまえる
+    if (Math.abs(px - bx) < 300) {
+      b.phase = 'roar'; b.timer = 70;
+      showMsg('虎があらわれた！', 120);
+      beep(90, 0.7, 'sawtooth', 0.07);
+      shake = 12;
+    }
+    b.anim = 0;
+    moveBox(b, 0.6, 14);
+    return;
+  }
+
+  b.face = px < bx ? -1 : 1;
+  b.timer--;
+
+  if (b.phase === 'roar') {
+    b.vx = 0;
+    if (b.timer <= 0) {
+      // 咆哮で雑魚を呼ぶ（増えすぎないよう2体までに抑える）
+      const alive = enemies.filter(function (e) { return !e.dead; }).length;
+      if (alive < 2) {
+        const sx = b.x + (b.roars % 2 ? 46 : -66);
+        enemies.push(b.roars % 2 === 0 ? makeMouse(sx, b.y + 32) : makeWolf(sx, b.y + 32));
+      }
+      b.roars++;
+      b.phase = 'walk'; b.timer = 60;
+      beep(120, 0.4, 'sawtooth', 0.06);
+    }
+  } else if (b.phase === 'walk') {
+    b.vx = b.face * 1.1;
+    if (b.timer <= 0) {
+      b.phase = Math.random() < 0.55 ? 'crouch' : 'leapReady';
+      b.timer = b.phase === 'crouch' ? 30 : 26;
+    }
+  } else if (b.phase === 'crouch') {
+    // 突進の溜め
+    b.vx = 0;
+    if (b.timer <= 0) { b.phase = 'dash'; b.timer = 46; b.vx = b.face * 5.0; beep(200, 0.15, 'sawtooth', 0.05); }
+  } else if (b.phase === 'dash') {
+    if (b.timer <= 0 || b.hitWall) { b.phase = 'walk'; b.timer = 70; b.vx = 0; }
+  } else if (b.phase === 'leapReady') {
+    b.vx = 0;
+    if (b.timer <= 0) {
+      b.phase = 'leap'; b.timer = 120;
+      b.vy = -13.5; b.vx = b.face * 3.0;
+      beep(420, 0.16, 'square', 0.05);
+    }
+  } else if (b.phase === 'leap') {
+    if (b.onGround && b.vy === 0 && b.timer < 110) {
+      // 着地: 地震＋天井から落石
+      b.phase = (b.roars < 3 && Math.random() < 0.5) ? 'roar' : 'walk';
+      b.timer = b.phase === 'roar' ? 60 : 80;
+      b.vx = 0;
+      shake = 16;
+      beep(70, 0.4, 'sawtooth', 0.07);
+      const n = 4;
+      for (let i = 0; i < n; i++) {
+        rocks.push({
+          x: player.x - 120 + Math.random() * 240 + i * 8, y: 40 + Math.random() * 30,
+          w: 18, h: 18, vy: 0, life: 220, spin: Math.random() * 6
+        });
+      }
+      for (let i = 0; i < 12; i++) {
+        particles.push({
+          x: b.x + Math.random() * b.w, y: b.y + b.h,
+          vx: (Math.random() - .5) * 8, vy: -Math.random() * 4, life: 30, col: '#c9b48a'
+        });
+      }
+    }
+  }
+
+  b.hitWall = 0;
+  moveBox(b, 0.6, 15);
+  if (b.hitWall && b.phase !== 'leap') b.vx = 0;
+  b.anim = (b.phase === 'dash') ? (Math.floor(frameCount / 3) % 2)
+    : (b.phase === 'walk' ? (Math.floor(frameCount / 9) % 2) : 0);
+
+  // プレイヤーとの接触・踏みつけ
+  if (player.deadTimer === 0 && hit(player, b)) {
+    const stomping = player.vy > 1 && (player.y + player.h) - player.vy <= b.y + 16;
+    if (stomping) {
+      hurtBoss(1, 'stomp');
+      player.vy = -9.5;
+    } else if (player.inv === 0) {
+      damagePlayer();
+      // 押し返す
+      player.vx = (player.x < b.x ? -4 : 4);
+    }
+  }
+  // うんこが当たったら
+  for (let i = poops.length - 1; i >= 0; i--) {
+    if (hit(poops[i], b)) {
+      for (let k = 0; k < 5; k++) {
+        particles.push({ x: poops[i].x, y: poops[i].y, vx: (Math.random() - .5) * 5, vy: -Math.random() * 4, life: 24, col: '#8b5a2b' });
+      }
+      poops.splice(i, 1);
+      hurtBoss(1, 'poop');
+    }
+  }
+}
+
+function hurtBoss(dmg, how) {
+  const b = boss;
+  if (!b || b.inv > 0 || bossWin > 0) return;
+  b.hp -= dmg;
+  b.inv = 46;
+  // ひるませる（踏んだ直後に突進されないように）
+  b.phase = 'walk'; b.timer = 50; b.vx = 0;
+  score += how === 'poop' ? 300 : 200;
+  shake = 10;
+  sfxKill();
+  for (let k = 0; k < 10; k++) {
+    particles.push({
+      x: b.x + b.w / 2, y: b.y + b.h / 2,
+      vx: (Math.random() - .5) * 8, vy: -Math.random() * 6, life: 36, col: '#f0801f'
+    });
+  }
+  if (b.hp <= 0) {
+    b.hp = 0;
+    bossWin = 130;
+    score += 5000;
+    popups.push({ x: b.x - 20, y: b.y, t: '+5000', life: 90 });
+    showMsg('虎を倒した！！', 130);
+    sfxClear();
+  } else {
+    popups.push({ x: b.x + 10, y: b.y, t: 'のこり ' + b.hp, life: 45, col: '#ffd93b' });
+  }
+}
+
+function drawBoss() {
+  const b = boss;
+  if (!b) return;
+  if (b.inv > 0 && Math.floor(frameCount / 3) % 2 === 0 && bossWin === 0) return;
+  const x = b.x - cam.x - 7, y = b.y - 4;
+  ctx.save();
+  if (bossWin > 0) {
+    ctx.globalAlpha = Math.max(0, bossWin / 130);
+    ctx.translate(x + 40, y + 44); ctx.rotate((130 - bossWin) * 0.02); ctx.translate(-(x + 40), -(y + 44));
+  }
+  // 溜め・突進の見せ方
+  if (b.phase === 'crouch' || b.phase === 'leapReady') {
+    ctx.fillStyle = 'rgba(255,90,60,' + (0.35 + Math.sin(frameCount / 2.5) * 0.3) + ')';
+    ctx.fillRect(x + 8, y - 14, 62, 7);
+  } else if (b.phase === 'dash') {
+    ctx.fillStyle = 'rgba(255,255,255,.4)';
+    for (let s = 1; s <= 4; s++) ctx.fillRect(x + (b.face > 0 ? -12 * s : 76 + 12 * s), y + 18 + s * 11, 11, 4);
+  }
+  drawSprite(TIGER[b.anim || 0], x, y, 4, b.face > 0);
+  ctx.restore();
+}
+
+function updateRocks() {
+  for (let i = rocks.length - 1; i >= 0; i--) {
+    const r = rocks[i];
+    r.vy += 0.42; if (r.vy > 11) r.vy = 11;
+    r.y += r.vy; r.life--; r.spin += 0.12;
+    // 地面に当たったら砕ける
+    const c = Math.floor((r.x + 9) / TILE), ry = Math.floor((r.y + r.h) / TILE);
+    if (isSolid(c, ry) || r.life <= 0 || r.y > LEVEL_H) {
+      for (let k = 0; k < 5; k++) {
+        particles.push({ x: r.x + 9, y: r.y + 9, vx: (Math.random() - .5) * 5, vy: -Math.random() * 4, life: 22, col: '#a89272' });
+      }
+      rocks.splice(i, 1);
+      continue;
+    }
+    if (player.deadTimer === 0 && player.inv === 0 && hit(player, r)) {
+      damagePlayer();
+      rocks.splice(i, 1);
+    }
+  }
+}
+
+function drawRocks() {
+  for (let i = 0; i < rocks.length; i++) {
+    const r = rocks[i];
+    const x = r.x - cam.x, y = r.y;
+    ctx.save();
+    ctx.translate(x + 9, y + 9); ctx.rotate(r.spin); ctx.translate(-(x + 9), -(y + 9));
+    ctx.fillStyle = '#8a7a5e'; ctx.fillRect(x, y, 18, 18);
+    ctx.fillStyle = '#a89272'; ctx.fillRect(x + 2, y + 2, 10, 6);
+    ctx.fillStyle = '#5e523c'; ctx.fillRect(x + 4, y + 12, 12, 4);
+    ctx.restore();
+  }
+}
+
+function updatePet() {
+  if (!pet) return;
+  // ロマ子様の足あとを少し遅れてたどる（ジャンプもマネする）
+  petTrail.push({ x: player.x, y: player.y, face: player.face });
+  if (petTrail.length > 22) petTrail.shift();
+  const t = petTrail[0];
+  pet.x = t.x; pet.y = t.y + 10; pet.face = t.face;
+  // 立ち止まったときは重ならないよう後ろに下がる
+  if (Math.abs(pet.x - player.x) < 22 && Math.abs(pet.y - (player.y + 10)) < 12) {
+    pet.x = player.x - (pet.face >= 0 ? 26 : -26);
+  }
+  pet.anim = Math.abs(player.vx) > 0.4 ? (Math.floor(frameCount / 7) % 2) : 0;
+}
+
 function updateEffects() {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
@@ -1283,7 +2062,7 @@ function updateEffects() {
   }
   for (let i = popups.length - 1; i >= 0; i--) {
     const p = popups[i];
-    p.y -= 0.8; p.life--;
+    p.y += (p.vy !== undefined ? p.vy : -0.8); p.life--;
     if (p.life <= 0) popups.splice(i, 1);
   }
   if (shake > 0) shake--;
@@ -1304,6 +2083,8 @@ function updateCamera() {
 
 function drawBackground() {
   if (theme === 'sky') { drawSkyBackground(); return; }
+  if (theme === 'grass') { drawGrassBackground(); return; }
+  if (theme === 'fort') { drawFortBackground(); return; }
   const g = ctx.createLinearGradient(0, 0, 0, VH);
   g.addColorStop(0, '#5ab4ec');
   g.addColorStop(0.7, '#a8dcf7');
@@ -1377,6 +2158,173 @@ function drawSkyBackground() {
   ctx.lineWidth = 1;
 }
 
+function drawGrassBackground() {
+  const g = ctx.createLinearGradient(0, 0, 0, VH);
+  g.addColorStop(0, '#48a8e8');
+  g.addColorStop(0.5, '#9fd8f2');
+  g.addColorStop(0.78, '#e9f5c4');
+  g.addColorStop(1, '#c6e88a');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, VW, VH);
+
+  // 太陽
+  ctx.fillStyle = 'rgba(255,250,200,.75)';
+  puff(560 - cam.x * 0.02, 76, 34);
+  ctx.fillStyle = 'rgba(255,255,230,.5)';
+  puff(560 - cam.x * 0.02, 76, 50);
+
+  // 遠くの山なみ
+  ctx.fillStyle = '#8fb8a8';
+  for (let i = 0; i < 22; i++) {
+    const x = i * 200 - (cam.x * 0.1) % 200 - 100;
+    ctx.beginPath();
+    ctx.moveTo(x - 110, 336); ctx.lineTo(x, 214); ctx.lineTo(x + 110, 336);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.fillStyle = '#7aa78f';
+  for (let i = 0; i < 22; i++) {
+    const x = i * 165 - (cam.x * 0.16) % 165 - 60;
+    ctx.beginPath();
+    ctx.moveTo(x - 90, 344); ctx.lineTo(x, 250); ctx.lineTo(x + 90, 344);
+    ctx.closePath(); ctx.fill();
+  }
+  // ゆるやかな草の丘（奥→手前）
+  ctx.fillStyle = '#8ccf62';
+  for (let i = 0; i < 26; i++) {
+    const x = i * 230 - (cam.x * 0.26) % 230 - 110;
+    ctx.beginPath(); ctx.arc(x, 430, 140, Math.PI, 0); ctx.fill();
+  }
+  ctx.fillStyle = '#6fbc4c';
+  for (let i = 0; i < 26; i++) {
+    const x = i * 175 - (cam.x * 0.42) % 175 - 50;
+    ctx.beginPath(); ctx.arc(x, 448, 100, Math.PI, 0); ctx.fill();
+  }
+  // 雲
+  ctx.fillStyle = 'rgba(255,255,255,.9)';
+  for (let i = 0; i < 14; i++) {
+    const x = i * 290 - (cam.x * 0.13) % 290 - 120;
+    const y = 56 + (i % 3) * 44;
+    puff(x, y, 22); puff(x + 24, y - 10, 29); puff(x + 52, y, 21);
+  }
+  // 風にゆれる草むら（手前）
+  const sway = Math.sin(frameCount / 26) * 3;
+  const BASE = 420;   // 地面のすぐ上から草が生えているように見せる
+  for (let i = 0; i < 46; i++) {
+    const x = i * 78 - (cam.x * 0.62) % 78 - 40;
+    const h = 30 + (i % 4) * 11;
+    ctx.strokeStyle = i % 2 ? '#4e9c39' : '#5fae44';
+    ctx.lineWidth = 3;
+    for (let b = -1; b <= 1; b++) {
+      ctx.beginPath();
+      ctx.moveTo(x + b * 8, BASE);
+      ctx.quadraticCurveTo(x + b * 8 + sway, BASE - h * 0.6, x + b * 11 + sway * 2.2, BASE - h);
+      ctx.stroke();
+    }
+    if (i % 5 === 0) {   // 花
+      ctx.fillStyle = i % 10 === 0 ? '#ff8fbf' : '#fff0a0';
+      puff(x + 13 + sway, BASE - h - 3, 4);
+    }
+  }
+  ctx.lineWidth = 1;
+}
+
+function drawFortBackground() {
+  const g = ctx.createLinearGradient(0, 0, 0, VH);
+  g.addColorStop(0, '#2a1a2e');
+  g.addColorStop(0.6, '#3d2733');
+  g.addColorStop(1, '#241820');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, VW, VH);
+
+  // 奥の石壁
+  const off = (cam.x * 0.35) % 64;
+  for (let r = 0; r < 9; r++) {
+    for (let c = -1; c < 12; c++) {
+      const x = c * 64 - off + (r % 2 ? 32 : 0), y = r * 54;
+      ctx.fillStyle = (r + c) % 3 === 0 ? '#4a3340' : '#443040';
+      ctx.fillRect(x, y, 62, 52);
+      ctx.fillStyle = 'rgba(255,255,255,.05)';
+      ctx.fillRect(x, y, 62, 4);
+    }
+  }
+  // 柱
+  const poff = (cam.x * 0.55) % 320;
+  for (let i = -1; i < 4; i++) {
+    const x = i * 320 - poff + 80;
+    ctx.fillStyle = '#584056'; ctx.fillRect(x, 0, 42, VH);
+    ctx.fillStyle = '#6b4f68'; ctx.fillRect(x, 0, 10, VH);
+    ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(x + 34, 0, 8, VH);
+    // 虎の旗
+    ctx.fillStyle = '#8f2b2b'; ctx.fillRect(x - 26, 34, 94, 118);
+    ctx.fillStyle = '#6d1f1f'; ctx.fillRect(x - 26, 148, 94, 12);
+    // 虎の顔（耳・縞・牙）
+    ctx.fillStyle = '#f0801f';
+    ctx.beginPath(); ctx.moveTo(x - 3, 70); ctx.lineTo(x + 4, 52); ctx.lineTo(x + 13, 70); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x + 29, 70); ctx.lineTo(x + 38, 52); ctx.lineTo(x + 45, 70); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 21, 90, 26, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#3b1f0b';
+    ctx.fillRect(x + 2, 74, 5, 12); ctx.fillRect(x + 35, 74, 5, 12);   // 縞
+    ctx.fillRect(x + 9, 84, 7, 6); ctx.fillRect(x + 26, 84, 7, 6);     // 目
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x + 12, 100, 18, 8);
+    ctx.fillStyle = '#3b1f0b';
+    ctx.fillRect(x + 16, 100, 2, 5); ctx.fillRect(x + 24, 100, 2, 5);
+  }
+  // 松明（ゆらめく炎）
+  const toff = (cam.x * 0.75) % 200;
+  for (let i = -1; i < 6; i++) {
+    const x = i * 200 - toff + 40, y = 210;
+    ctx.fillStyle = '#3b2b22'; ctx.fillRect(x, y, 9, 30);
+    const fl = Math.sin(frameCount / 4 + i) * 3;
+    ctx.fillStyle = 'rgba(255,150,40,.10)';
+    ctx.beginPath(); ctx.arc(x + 4, y - 6, 46 + fl, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,170,60,.13)';
+    ctx.beginPath(); ctx.arc(x + 4, y - 6, 26 + fl, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#ff9b1f';
+    ctx.beginPath();
+    ctx.moveTo(x - 6, y); ctx.quadraticCurveTo(x + 4, y - 26 - fl, x + 14, y);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffe27a';
+    ctx.beginPath();
+    ctx.moveTo(x - 1, y); ctx.quadraticCurveTo(x + 4, y - 14 - fl, x + 9, y);
+    ctx.closePath(); ctx.fill();
+  }
+  // 全体をすこし暗く
+  ctx.fillStyle = 'rgba(20,8,25,.22)';
+  ctx.fillRect(0, 0, VW, VH);
+}
+
+function drawFortTile(x, y, top) {
+  ctx.fillStyle = '#7a6b74';
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = '#665860';
+  ctx.fillRect(x, y + 15, TILE, 3); ctx.fillRect(x + 15, y, 3, 15);
+  ctx.fillRect(x + 7, y + 18, 3, 14); ctx.fillRect(x + 23, y + 18, 3, 14);
+  if (top) {
+    ctx.fillStyle = '#94848d'; ctx.fillRect(x, y, TILE, 6);
+    ctx.fillStyle = '#a99aa2'; ctx.fillRect(x, y, TILE, 2);
+  }
+  ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.fillRect(x, y + TILE - 3, TILE, 3);
+}
+
+function drawGrassTile(x, y, top) {
+  ctx.fillStyle = '#8a6a3c';
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = '#75592f';
+  ctx.fillRect(x, y + 20, TILE, 4); ctx.fillRect(x + 13, y + 9, 5, 5);
+  if (top) {
+    ctx.fillStyle = '#4e9c39'; ctx.fillRect(x, y, TILE, 12);
+    ctx.fillStyle = '#6fc44c'; ctx.fillRect(x, y, TILE, 6);
+    // 草の穂
+    ctx.fillStyle = '#8ddb63';
+    const s = Math.round(Math.sin(frameCount / 22 + x) * 1.5);
+    ctx.fillRect(x + 5 + s, y - 5, 2, 6);
+    ctx.fillRect(x + 15 - s, y - 7, 2, 8);
+    ctx.fillRect(x + 25 + s, y - 4, 2, 5);
+  }
+  ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fillRect(x, y + TILE - 3, TILE, 3);
+}
+
 function drawCloudTile(x, y, topOpen) {
   ctx.fillStyle = '#e8f4ff';
   ctx.fillRect(x, y + 8, TILE, TILE - 8);
@@ -1407,6 +2355,8 @@ function drawTiles() {
       if (t === '#') {
         const top = !isSolid(c, r - 1);
         if (theme === 'sky') { drawCloudTile(x, y, top); continue; }
+        if (theme === 'grass') { drawGrassTile(x, y, top); continue; }
+        if (theme === 'fort') { drawFortTile(x, y, top); continue; }
         ctx.fillStyle = '#a4622d'; ctx.fillRect(x, y, TILE, TILE);
         ctx.fillStyle = '#8a4f22';
         ctx.fillRect(x, y + 20, TILE, 4); ctx.fillRect(x + 12, y + 8, 5, 5);
@@ -1421,25 +2371,39 @@ function drawTiles() {
         ctx.fillRect(x, y + 15, TILE, 2); ctx.fillRect(x + 15, y, 2, 15); ctx.fillRect(x + 7, y + 17, 2, 15); ctx.fillRect(x + 23, y + 17, 2, 15);
         ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.strokeRect(x + .5, y + .5, TILE - 1, TILE - 1);
       } else if (t === 'X') {
+        // 大草原では岩ではなく草の生えた土の丘にする
+        if (theme === 'grass') { drawGrassTile(x, y, !isSolid(c, r - 1)); continue; }
+        if (theme === 'fort') { drawFortTile(x, y, !isSolid(c, r - 1)); continue; }
         ctx.fillStyle = '#8b8f9a'; ctx.fillRect(x, y, TILE, TILE);
         ctx.fillStyle = '#6b707c'; ctx.fillRect(x + 3, y + 3, TILE - 6, TILE - 6);
         ctx.fillStyle = '#a9aeb8'; ctx.fillRect(x + 6, y + 6, 8, 4);
       } else if (t === 'U') {
         ctx.fillStyle = '#96733e'; ctx.fillRect(x, y, TILE, TILE);
         ctx.fillStyle = '#7a5c30'; ctx.fillRect(x + 3, y + 3, TILE - 6, TILE - 6);
-      } else if (t === '?' || t === '!' || t === '1') {
+      } else if (t === '?' || t === '!' || t === '1' || t === 'K') {
         const blink = Math.sin(frameCount / 8) * 0.3 + 0.7;
-        ctx.fillStyle = t === '!' ? '#ff8fbf' : (t === '1' ? '#e8484f' : '#e8a33d');
+        ctx.fillStyle = t === '!' ? '#ff8fbf' : (t === '1' ? '#e8484f' : (t === 'K' ? '#e08fb0' : '#e8a33d'));
         ctx.fillRect(x, y, TILE, TILE);
         ctx.fillStyle = 'rgba(255,255,255,' + (blink * 0.5) + ')';
         ctx.fillRect(x + 2, y + 2, TILE - 4, 4);
         ctx.fillStyle = '#5a3a12';
         ctx.fillRect(x + 2, y + 2, 4, 4); ctx.fillRect(x + TILE - 6, y + 2, 4, 4);
         ctx.fillRect(x + 2, y + TILE - 6, 4, 4); ctx.fillRect(x + TILE - 6, y + TILE - 6, 4, 4);
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 20px monospace'; ctx.textAlign = 'center';
-        ctx.fillText(t === '!' ? '♛' : (t === '1' ? '♥' : '?'), x + TILE / 2, y + TILE / 2 + 7);
-        ctx.textAlign = 'left';
+        if (t === 'K') {
+          // コブタの顔
+          ctx.fillStyle = '#ffd9e6';
+          ctx.fillRect(x + 8, y + 10, 16, 13);
+          ctx.fillRect(x + 6, y + 7, 5, 5); ctx.fillRect(x + 21, y + 7, 5, 5);
+          ctx.fillStyle = '#8a3a55';
+          ctx.fillRect(x + 11, y + 13, 3, 3); ctx.fillRect(x + 18, y + 13, 3, 3);
+          ctx.fillStyle = '#e0789a'; ctx.fillRect(x + 12, y + 18, 8, 5);
+          ctx.fillStyle = '#8a3a55'; ctx.fillRect(x + 14, y + 19, 1, 3); ctx.fillRect(x + 17, y + 19, 1, 3);
+        } else {
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 20px monospace'; ctx.textAlign = 'center';
+          ctx.fillText(t === '!' ? '♛' : (t === '1' ? '♥' : '?'), x + TILE / 2, y + TILE / 2 + 7);
+          ctx.textAlign = 'left';
+        }
       } else if (t === 'C') {
         drawSprite(COIN, x + 6, y + 6 + Math.sin(frameCount / 10 + c) * 2, 2, false);
       } else if (t === 'G') {
@@ -1460,6 +2424,11 @@ function drawTiles() {
       }
     }
   }
+}
+
+function drawPet() {
+  if (!pet) return;
+  drawSprite(KOBUTA[pet.anim || 0], pet.x - cam.x - 1, pet.y, 2, pet.face < 0);
 }
 
 function drawPlayer() {
@@ -1483,9 +2452,22 @@ function drawEnemies() {
   for (let i = 0; i < enemies.length; i++) {
     const e = enemies[i];
     if (e.x < cam.x - 80 || e.x > cam.x + VW + 80) continue;
-    const sp = (e.type === 'wolf' ? WOLF : OTAKU)[e.dead ? 0 : (e.anim || 0)];
+    const set = e.type === 'wolf' ? WOLF : (e.type === 'mouse' ? MOUSE : OTAKU);
+    const sp = set[e.dead ? 0 : (e.anim || 0)];
     const x = e.x - cam.x - 2, y = e.y - 2;
     ctx.save();
+    // ネズミの溜め・ダッシュの見せ方
+    if (e.type === 'mouse' && !e.dead) {
+      if (e.phase === 'crouch') {
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.3 + Math.sin(frameCount / 2.5) * 0.25) + ')';
+        ctx.fillRect(x + 4, y - 8, 24, 4);
+      } else if (e.phase === 'dash') {
+        ctx.fillStyle = 'rgba(255,255,255,.45)';
+        for (let s = 1; s <= 3; s++) {
+          ctx.fillRect(x + (e.face > 0 ? -8 * s : 30 + 8 * s), y + 10 + s * 5, 7, 2);
+        }
+      }
+    }
     if (e.dead) {
       ctx.globalAlpha = Math.max(0, e.dead / 30);
       ctx.translate(x + 16, y + 18); ctx.rotate(e.rot || 0); ctx.translate(-(x + 16), -(y + 18));
@@ -1536,6 +2518,10 @@ function drawItems() {
       ctx.fillStyle = 'rgba(255,90,110,' + (0.18 + Math.sin(frameCount / 6) * 0.12) + ')';
       ctx.beginPath(); ctx.arc(it.x - cam.x + 15, it.y + 10, 22, 0, Math.PI * 2); ctx.fill();
       drawSprite(HAIRPIN, it.x - cam.x, it.y, 2, false);
+    } else if (it.type === 'kobuta') {
+      ctx.fillStyle = 'rgba(255,176,196,' + (0.2 + Math.sin(frameCount / 6) * 0.12) + ')';
+      ctx.beginPath(); ctx.arc(it.x - cam.x + 14, it.y + 12, 25, 0, Math.PI * 2); ctx.fill();
+      drawSprite(KOBUTA[Math.floor(frameCount / 16) % 2], it.x - cam.x, it.y, 2, false);
     } else {
       drawSprite(CROWN, it.x - cam.x, it.y, 2, false);
     }
@@ -1550,12 +2536,25 @@ function drawEffects() {
     ctx.fillRect((p.x - cam.x) | 0, p.y | 0, 5, 5);
   }
   ctx.globalAlpha = 1;
-  ctx.font = 'bold 14px monospace';
   for (let i = 0; i < popups.length; i++) {
     const p = popups[i];
     ctx.globalAlpha = Math.min(1, p.life / 20);
-    ctx.fillStyle = p.col || '#fff';
-    ctx.fillText(p.t, p.x - cam.x, p.y);
+    if (p.big) {
+      // 断末魔はドット絵風に太く・黒フチつきで
+      ctx.font = 'bold 22px "Hiragino Maru Gothic ProN", "Yu Gothic", monospace';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 7; ctx.strokeStyle = '#1b1027';
+      ctx.strokeText(p.t, p.x - cam.x, p.y);
+      ctx.lineWidth = 3; ctx.strokeStyle = '#7a3b12';
+      ctx.strokeText(p.t, p.x - cam.x, p.y);
+      ctx.fillStyle = p.col || '#ffd93b';
+      ctx.fillText(p.t, p.x - cam.x, p.y);
+      ctx.lineWidth = 1;
+    } else {
+      ctx.font = 'bold 14px monospace';
+      ctx.fillStyle = p.col || '#fff';
+      ctx.fillText(p.t, p.x - cam.x, p.y);
+    }
   }
   ctx.globalAlpha = 1;
 }
@@ -1581,6 +2580,22 @@ function drawHUD() {
   ctx.fillText('ST' + (stage + 1), 480, 23);
   ctx.fillStyle = '#fff';
   ctx.fillText('TIME ' + Math.ceil(timeLeft), 535, 23);
+
+  // ボスのHPバー
+  if (boss && boss.phase !== 'sleep') {
+    const bw = 300, bx0 = VW / 2 - bw / 2, by0 = VH - 34;
+    ctx.fillStyle = 'rgba(20,8,35,.75)';
+    ctx.fillRect(bx0 - 6, by0 - 18, bw + 12, 30);
+    ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#ffb37a';
+    ctx.fillText('虎', bx0, by0 - 6);
+    ctx.fillStyle = 'rgba(255,255,255,.22)';
+    ctx.fillRect(bx0, by0 - 2, bw, 12);
+    ctx.fillStyle = boss.hp <= 2 ? '#ef4444' : '#f0801f';
+    ctx.fillRect(bx0, by0 - 2, bw * (boss.hp / boss.maxHp), 12);
+    ctx.strokeStyle = '#ffd9b8'; ctx.lineWidth = 2;
+    ctx.strokeRect(bx0, by0 - 2, bw, 12); ctx.lineWidth = 1;
+  }
 
   // 進行度バー
   const prog = Math.min(1, (player.x + player.w / 2) / LEVEL_W);
@@ -1624,10 +2639,14 @@ function drawTitle() {
   drawSprite(ROMAKO[0], 78, 250, 5, false);
   drawSprite(CROWN, 86, 220, 5, false);
   drawSprite(YAMIKO[0], 186, 250, 5, false);
-  drawSprite(WOLF[0], 355, 260, 4, true);
-  drawSprite(OTAKU[0], 455, 258, 4, true);
-  drawSprite(POOP, 292, 300, 3, false);
-  drawSprite(HAIRPIN, 288, 246, 3, false);
+  drawSprite(ROMAKO[0], 78, 250, 5, false);
+  drawSprite(KOBUTA[0], 258, 300, 3, false);
+  drawSprite(TIGER[0], 486, 236, 4, true);
+  drawSprite(WOLF[0], 330, 268, 3, true);
+  drawSprite(OTAKU[0], 396, 266, 3, true);
+  drawSprite(MOUSE[0], 440, 268, 3, true);
+  drawSprite(POOP, 196, 318, 3, false);
+  drawSprite(HAIRPIN, 250, 246, 3, false);
 
   ctx.textAlign = 'center';
   ctx.font = 'bold 44px sans-serif';
@@ -1640,7 +2659,7 @@ function drawTitle() {
   ctx.fillStyle = '#fff';
   ctx.fillText('👑をとると 💩 が投げられる。当たった敵は死ぬ。', VW / 2, 156);
   ctx.fillStyle = '#ffb0b8';
-  ctx.fillText('赤いヘアピンは 1UP。ぜんぶで2ステージ！', VW / 2, 180);
+  ctx.fillText('赤いヘアピンは 1UP。コブタは身代わり。全4ステージ！', VW / 2, 180);
   ctx.fillStyle = '#c9e6ff';
   ctx.fillText('ロマ子様がやられたら ヤミ子 が交代で出撃！', VW / 2, 204);
   ctx.font = 'bold 20px sans-serif';
@@ -1671,7 +2690,7 @@ function drawClear() {
 function drawAllClear() {
   centerText([
     { t: 'ALL CLEAR !!', f: 'bold 46px sans-serif', c: '#ffd93b', gap: 52 },
-    { t: '空の王国にも平和が戻った（においは残った）', f: 'bold 19px sans-serif', c: '#fff', gap: 44 },
+    { t: '虎の要塞は陥ちた。王国に平和が戻った（においは残った）', f: 'bold 17px sans-serif', c: '#fff', gap: 44 },
     { t: 'TOTAL SCORE ' + score, f: 'bold 30px monospace', c: '#8fd6ff', gap: 38 },
     { t: '💰 ' + coins + '　　のこり ' + lives + '人', f: 'bold 20px monospace', c: '#fff', gap: 56 },
     { t: 'スペースキー / 画面のボタン でもう一度', f: 'bold 18px sans-serif', c: Math.floor(frameCount / 20) % 2 ? '#fff' : '#4da6ff' }
@@ -1694,6 +2713,9 @@ function loop() {
     updateEnemies();
     updatePoops();
     updateItems();
+    updatePet();
+    updateBoss();
+    updateRocks();
     updateEffects();
     updateCamera();
   } else {
@@ -1715,7 +2737,10 @@ function loop() {
     drawTiles();
     drawItems();
     drawEnemies();
+    drawBoss();
+    drawRocks();
     drawPoops();
+    drawPet();
     drawPlayer();
     drawEffects();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
